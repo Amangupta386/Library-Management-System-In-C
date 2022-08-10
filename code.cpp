@@ -1,913 +1,890 @@
-#include<iostream>
+#include<windows.h>
 #include<stdio.h>
-#include<stdlib.h>
-#include<fstream>
-#include<string.h>
 #include<conio.h>
-using namespace std;
-class Lib
+#include <stdlib.h>
+#include<string.h>                  //contains strcmp(),strcpy(),strlen(),etc
+#include<ctype.h>                   //contains toupper(), tolower(),etc
+#include<dos.h>                     //contains _dos_getdate
+#include<time.h>
+//#include<bios.h>
+
+#define RETURNTIME 15
+
+char catagories[][15]={"Computer","Electronics","Electrical","Civil","Mechnnical","Architecture"};
+void returnfunc(void);
+void mainmenu(void);
+void addbooks(void);
+void deletebooks(void);
+void editbooks(void);
+void searchbooks(void);
+void issuebooks(void);
+void viewbooks(void);
+void closeapplication(void);
+int  getdata();
+int  checkid(int);
+int t(void);
+//void show_mouse(void);
+void Password();
+void issuerecord();
+void loaderanim();
+
+//list of global files that can be acceed form anywhere in program
+FILE *fp,*ft,*fs;
+
+
+COORD coord = {0, 0};
+//list of global variable
+int s;
+char findbook;
+char password[10]={"codewithc"};
+
+void gotoxy (int x, int y)
 {
-   public:
-       char bookname[100],auname[50],sc[20],sc1[50];
-       int q,B,p;
-       Lib()
-       {
-           strcpy(bookname,"NO Book Name");
-           strcpy(auname,"No Author Name");
-           strcpy(sc,"No Book ID");
-           strcpy(sc1,"No Book ID");
-           q=0;
-           B=0;
-           p=0;
-       }
-          void get();
-          void student();
-          void pass();
-          void librarian();
-          void password();
-          void getdata();
-          void show(int);
-          void booklist(int);
-          void modify();
-          void see(int);
-          int branch(int);
-          void issue();
-          void der(char[],int,int);
-          void fine(int,int,int,int,int,int);
+coord.X = x; coord.Y = y; // X and Y coordinates
+SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+}
+
+struct meroDate
+{
+int mm,dd,yy;
 };
-void Lib::getdata()
+struct books
 {
-                    int i;
-                    fflush(stdin);
-                    cout<<"\n\t\tEnter the details :-\n";
-                    cout<<"\n\t\tEnter Book's Name : ";
-                    cin.getline(bookname,100);
-                    for(i=0;bookname[i]!='\0';i++)
-                    {
-                    if(bookname[i]>='a'&&bookname[i]<='z')
-                       bookname[i]-=32;
-                    }
-                    cout<<"\n\t\tEnter Author's Name : ";
-                    cin.getline(auname,50);
-                    cout<<"\n\t\tEnter Publication name : ";
-                    cin.getline(sc1,50);
-                    cout<<"\n\t\tEnter Book's ID : ";
-                    cin.getline(sc,20);
-                    cout<<"\n\t\tEnter Book's Price : ";
-                    cin>>p;
-                    cout<<"\n\t\tEnter Book's Quantity : ";
-                    cin>>q;
-}
-void Lib::show(int i)
-{
-    cout<<"\n\t\tBook Name : "<<bookname<<endl;
-    cout<<"\n\t\tBook's Author Name : "<<auname<<endl;
-    cout<<"\n\t\tBook's ID : "<<sc<<endl;
-    cout<<"\n\t\tBook's Publication : "<<sc1<<endl;
-    if(i==2)
-    {
-        cout<<"\n\t\tBook's Price : "<<p<<endl;
-        cout<<"\n\t\tBook's Quantity : "<<q<<endl;
-    }
-}
-  void Lib::booklist(int i)
-  {
-                int b,r=0;
-                system("cls");
-                b=branch(i);
-                system("cls");
-                ifstream intf("Booksdata.txt",ios::binary);
-                if(!intf)
-                    cout<<"\n\t\tFile Not Found.";
-                else
-                {
-                    cout<<"\n\t    ************ Book List ************ \n\n";
-                    intf.read((char*)this,sizeof(*this));
-                while(!intf.eof())
-                {
-                    if(b==B)
-                    {
-                        if(q==0 && i==1)
-                        {
-
-                        }
-                        else
-                            {
-                                r++;
-                                cout<<"\n\t\t********** "<<r<<". ********** \n";
-                                show(i);
-                            }
-                    }
-                    intf.read((char*)this,sizeof(*this));
-                }
-                }
-                cout<<"\n\t\tPress any key to continue.....";
-                getch();
-                system("cls");
-                if(i==1)
-                    student();
-                else
-                    librarian();
-    }
-  void Lib::modify()
-  {
-    char ch,st1[100];
-    int i=0,b,cont=0;
-    system("cls");
-    cout<<"\n\t\t>>Please Choose one option :-\n";
-    cout<<"\n\t\t1.Modification In Current Books\n\n\t\t2.Add New Book\n\n\t\t3.Delete A Book\n\n\t\t4.Go back\n";
-    cout<<"\n\n\t\tEnter your choice : ";
-    cin>>i;
-    if(i==1)
-    {
-                    system("cls");
-                    b=branch(2);
-                    ifstream intf1("Booksdata.txt",ios::binary);
-                    if(!intf1)
-                    {
-                        cout<<"\n\t\tFile Not Found\n";
-                        cout<<"\n\t\tPress any key to continue.....";
-                        getch();
-                        system("cls");
-                        librarian();
-                    }
-                        intf1.close();
-                        system("cls");
-                        cout<<"\n\t\tPlease Choose One Option :-\n";
-                        cout<<"\n\t\t1.Search By Book Name\n\n\t\t2.Search By Book's ID\n";
-                        cout<<"\n\t\tEnter Your Choice : ";
-                        cin>>i;
-                        fflush(stdin);
-                        if(i==1)
-                            {
-                                system("cls");
-                                cout<<"\n\t\tEnter Book Name : ";
-                                cin.getline(st1,100);
-                                system("cls");
-                                fstream intf("Booksdata.txt",ios::in|ios::out|ios::ate|ios::binary);
-                                intf.seekg(0);
-                                intf.read((char*)this,sizeof(*this));
-                                while(!intf.eof())
-                                    {
-                                        for(i=0;b==B&&bookname[i]!='\0'&&st1[i]!='\0'&&(st1[i]==bookname[i]||st1[i]==bookname[i]+32);i++);
-                                        if(bookname[i]=='\0'&&st1[i]=='\0')
-                                            {
-                                                cont++;
-                                                getdata();
-                                                intf.seekp(intf.tellp()-sizeof(*this));
-                                                intf.write((char*)this,sizeof(*this));
-                                                break;
-                                            }
-                                                     intf.read((char*)this,sizeof(*this));
-                                    }
-                                    intf.close();
-                            }
-                        else if(i==2)
-                        {
-                                cout<<"\n\t\tEnter Book's ID : ";
-                                cin.getline(st1,100);
-                                system("cls");
-                                fstream intf("Booksdata.txt",ios::in|ios::out|ios::ate|ios::binary);
-                                intf.seekg(0);
-                                intf.read((char*)this,sizeof(*this));
-                                while(!intf.eof())
-                                    {
-                                        for(i=0;b==B&&sc[i]!='\0'&&st1[i]!='\0'&&st1[i]==sc[i];i++);
-                                        if(sc[i]=='\0'&&st1[i]=='\0')
-                                            {
-                                                cont++;
-                                                getdata();
-                                                intf.seekp(intf.tellp()-sizeof(*this));
-                                                intf.write((char*)this,sizeof(*this));
-                                                break;
-                                            }
-                                        intf.read((char*)this,sizeof(*this));
-                                    }
-
-                                intf.close();
-                        }
-                        else
-                        {
-                            cout<<"\n\t\tIncorrect Input.....:(\n";
-                            cout<<"\n\t\tPress any key to continue.....";
-                            getch();
-                            system("cls");
-                            modify();
-                        }
-                        if(cont==0)
-                        {
-                            cout<<"\n\t\tBook Not Found.\n";
-                            cout<<"\n\t\tPress any key to continue.....";
-                            getch();
-                            system("cls");
-                            modify();
-                        }
-                        else
-                            cout<<"\n\t\tUpdate Successful.\n";
-
-
-    }
-    else if(i==2)
-    {
-                    system("cls");
-                    B=branch(2);
-                    system("cls");
-                    getdata();
-                    ofstream outf("Booksdata.txt",ios::app|ios::binary);
-                    outf.write((char*)this,sizeof(*this));
-                    outf.close();
-                    cout<<"\n\t\tBook added Successfully.\n";
-    }
-    else if(i==3)
-    {
-                    system("cls");
-                    b=branch(2);
-                    ifstream intf1("Booksdata.txt",ios::binary);
-                    if(!intf1)
-                    {
-                        cout<<"\n\t\tFile Not Found\n";
-                        cout<<"\n\t\tPress any key to continue.....";
-                        getch();
-                        intf1.close();
-                        system("cls");
-                        librarian();
-                    }
-                        intf1.close();
-                        system("cls");
-                        cout<<"\n\t\tPlease Choose One Option for deletion:-\n";
-                        cout<<"\n\t\t1.By Book Name\n\n\t\t2.By Book's ID\n";
-                        cout<<"\n\t\tEnter Your Choice : ";
-                        cin>>i;
-                        fflush(stdin);
-                        if(i==1)
-                            {
-                                system("cls");
-                                cout<<"\n\t\tEnter Book Name : ";
-                                cin.getline(st1,100);
-                                ofstream outf("temp.txt",ios::app|ios::binary);
-                                ifstream intf("Booksdata.txt",ios::binary);
-                                intf.read((char*)this,sizeof(*this));
-                                while(!intf.eof())
-                                    {
-                                        for(i=0;b==B&&bookname[i]!='\0'&&st1[i]!='\0'&&(st1[i]==bookname[i]||st1[i]==bookname[i]+32);i++);
-                                        if(bookname[i]=='\0'&&st1[i]=='\0')
-                                            {
-                                                cont++;
-                                                intf.read((char*)this,sizeof(*this));
-
-                                            }
-                                        else
-                                        {
-                                        outf.write((char*)this,sizeof(*this));
-                                        intf.read((char*)this,sizeof(*this));
-                                        }
-                                    }
-
-                    intf.close();
-                    outf.close();
-                    remove("Booksdata.txt");
-                    rename("temp.txt","Booksdata.txt");
-                            }
-                        else if(i==2)
-                        {
-                                cout<<"\n\t\tEnter Book's ID : ";
-                                cin.getline(st1,100);
-                                ofstream outf("temp.txt",ios::app|ios::binary);
-                                ifstream intf("Booksdata.txt",ios::binary);
-                                intf.read((char*)this,sizeof(*this));
-                                while(!intf.eof())
-                                    {
-                                        for(i=0;b==B&&sc[i]!='\0'&&st1[i]!='\0'&&st1[i]==sc[i];i++);
-                                        if(sc[i]=='\0'&&st1[i]=='\0')
-                                            {
-                                                cont++;
-                                                intf.read((char*)this,sizeof(*this));
-                                            }
-                                        else
-                                        {
-                                        outf.write((char*)this,sizeof(*this));
-                                        intf.read((char*)this,sizeof(*this));
-                                        }
-                                    }
-                    outf.close();
-                    intf.close();
-                    remove("Booksdata.txt");
-                    rename("temp.txt","Booksdata.txt");
-                        }
-                        else
-                        {
-                            cout<<"\n\t\tIncorrect Input.....:(\n";
-                            cout<<"\n\t\tPress any key to continue.....";
-                            getch();
-                            system("cls");
-                            modify();
-                        }
-                        if(cont==0)
-                        {
-                            cout<<"\n\t\tBook Not Found.\n";
-                            cout<<"\n\t\tPress any key to continue.....";
-                            getch();
-                            system("cls");
-                            modify();
-                        }
-                        else
-                            cout<<"\n\t\tDeletion Successful.\n";
-
-    }
-    else if(i==4)
-    {
-    system("cls");
-    librarian();
-    }
-    else
-    {
-    cout<<"\n\t\tWrong Input.\n";
-    cout<<"\n\t\tPress any key to continue.....";
-    getch();
-    system("cls");
-    modify();
-    }
-    cout<<"\n\t\tPress any key to continue.....";
-    getch();
-    system("cls");
-    librarian();
-
-  }
-  int Lib::branch(int x)
-  {
-      int i;
-      cout<<"\n\t\t>>Please Choose one Branch :-\n";
-      cout<<"\n\t\t1.Class 12th\n\n\t\t2.CS\n\n\t\t3.EC\n\n\t\t4.CIVIL\n\n\t\t5.MECHANICAL\n\n\t\t6.1ST YEAR\n\n\t\t7.Go to menu\n";
-      cout<<"\n\t\tEnter youur choice : ";
-      cin>>i;
-      switch(i)
-      {
-          case 1: return 1;
-                  break;
-          case 2: return 2;
-                  break;
-          case 3: return 3;
-                  break;
-          case 4: return 4;
-                  break;
-          case 5: return 5;
-                  break;
-          case 6: return 6;
-                  break;
-          case 7: system("cls");
-                  if(x==1)
-                  student();
-                  else
-                    librarian();
-          default : cout<<"\n\t\tPlease enter correct option :(";
-                    getch();
-                    system("cls");
-                    branch(x);
-        }
-  }
-  void Lib::see(int x)
-  {
-      int i,b,cont=0;
-      char ch[100];
-      system("cls");
-      b=branch(x);
-      ifstream intf("Booksdata.txt",ios::binary);
-        if(!intf)
-        {
-            cout<<"\n\t\tFile Not Found.\n";
-            cout<<"\n\t\t->Press any key to continue.....";
-            getch();
-            system("cls");
-            if(x==1)
-            student();
-            else
-            librarian();
-        }
-
-      system("cls");
-      cout<<"\n\t\tPlease Choose one option :-\n";
-      cout<<"\n\t\t1.Search By Name\n\n\t\t2.Search By Book's ID\n";
-      cout<<"\n\t\tEnter Your Choice : ";
-      cin>>i;
-      fflush(stdin);
-      intf.read((char*)this,sizeof(*this));
-      if(i==1)
-      {
-          cout<<"\n\t\tEnter Book's Name : ";
-          cin.getline(ch,100);
-          system("cls");
-          while(!intf.eof())
-          {
-            for(i=0;b==B&&q!=0&&bookname[i]!='\0'&&ch[i]!='\0'&&(ch[i]==bookname[i]||ch[i]==bookname[i]+32);i++);
-            if(bookname[i]=='\0'&&ch[i]=='\0')
-                {
-                        cout<<"\n\t\tBook Found :-\n";
-                        show(x);
-                        cont++;
-                        break;
-                }
-             intf.read((char*)this,sizeof(*this));
-          }
-      }
-          else if(i==2)
-          {
-          cout<<"\n\t\tEnter Book's ID : ";
-          cin.getline(ch,100);
-          system("cls");
-          while(!intf.eof())
-          {
-              for(i=0;b==B&&q!=0&&sc[i]!='\0'&&ch[i]!='\0'&&ch[i]==sc[i];i++);
-              if(sc[i]=='\0'&&ch[i]=='\0')
-                {
-                            cout<<"\n\t\tBook Found :-\n";
-                            show(x);
-                            cont++;
-                            break;
-                }
-               intf.read((char*)this,sizeof(*this));
-          }
-
-          }
-          else
-          {
-             cont++;
-             cout<<"\n\t\tPlease enter correct option :(";
-             getch();
-             system("cls");
-             see(x);
-          }
-          intf.close();
-          if(cont==0)
-              cout<<"\n\t\tThis Book is not available :( \n";
-
-    cout<<"\n\t\tPress any key to continue.....";
-    getch();
-    system("cls");
-    if(x==1)
-    student();
-    else
-    librarian();
-
-
-  }
-void Lib::issue()
-{
-    char st[50],st1[20];
-    int b,i,j,d,m,y,dd,mm,yy,cont=0;
-    system("cls");
-    cout<<"\n\t\t->Please Choose one option :-\n";
-    cout<<"\n\t\t1.Issue Book\n\n\t\t2.View Issued Book\n\n\t\t3.Search student who isuued books\n\n\t\t4.Reissue Book\n\n\t\t5.Return Book\n\n\t\t6.Go back to menu\n\n\t\tEnter Your Choice : ";
-    cin>>i;
-    fflush(stdin);
-    if(i==1)
-    {
-    system("cls");
-    b=branch(2);
-    system("cls");
-    fflush(stdin);
-    cout<<"\n\t\t->Please Enter Details :-\n";
-    cout<<"\n\t\tEnter Book Name : ";
-    cin.getline(bookname,100);
-    cout<<"\n\t\tEnter Book's ID : ";
-    cin.getline(sc,20);
-    //strcpy(st,sc);
-    der(sc,b,1);
-    cout<<"\n\t\tEnter Student Name : ";
-    cin.getline(auname,100);
-    cout<<"\n\t\tEnter Student's ID : ";
-    cin.getline(sc1,20);
-    cout<<"\n\t\tEnter date : ";
-    cin>>q>>B>>p;
-    ofstream outf("student.txt",ios::binary|ios::app);
-    outf.write((char*)this,sizeof(*this));
-    outf.close();
-    cout<<"\n\n\t\tIssue Successfully.\n";
-    }
-    else if(i==2)
-    {
-    ifstream intf("student.txt",ios::binary);
-    system("cls");
-    cout<<"\n\t\t->The Details are :-\n";
-    intf.read((char*)this,sizeof(*this));
-    i=0;
-    while(!intf.eof())
-    {
-    i++;
-    cout<<"\n\t\t********** "<<i<<". ********** \n";
-    cout<<"\n\t\tStudent Name : "<<auname<<"\n\t\t"<<"Student's ID : "<<sc1<<"\n\t\t"<<"Book Name : "<<bookname<<"\n\t\t"<<"Book's ID : "<<sc<<"\n\t\t"<<"Date : "<<q<<"/"<<B<<"/"<<p<<"\n";
-    intf.read((char*)this,sizeof(*this));
-    }
-    intf.close();
-    }
-    else if(i==3)
-    {
-        system("cls");
-        fflush(stdin);
-        cout<<"\n\t\t->Please Enter Details :-\n";
-        cout<<"\n\n\t\tEnter Student Name : ";
-        cin.getline(st,50);
-        cout<<"\n\n\t\tEnter Student's ID : ";
-        cin.getline(st1,20);
-        system("cls");
-        ifstream intf("student.txt",ios::binary);
-        intf.read((char*)this,sizeof(*this));
-        cont=0;
-        while(!intf.eof())
-        {
-              for(i=0;sc1[i]!='\0'&&st1[i]!='\0'&&st1[i]==sc1[i];i++);
-              if(sc1[i]=='\0'&&st1[i]=='\0')
-              {
-                  cont++;
-                  if(cont==1)
-                  {
-                      cout<<"\n\t\t->The Details are :-\n";
-                      cout<<"\n\t\tStudent Name : "<<auname;
-                      cout<<"\n\t\tStudent's ID : "<<sc1;
-                  }
-                  cout<<"\n\n\t\t******* "<<cont<<". Book details *******\n";
-                  cout<<"\n\t\tBook Name : "<<bookname;
-                  cout<<"\n\t\tBook's ID : "<<sc;
-                  cout<<"\n\t\tDate : "<<q<<"/"<<B<<"/"<<p<<"\n";
-              }
-                      intf.read((char*)this,sizeof(*this));
-
-        }
-        intf.close();
-        if(cont==0)
-            cout<<"\n\t\tNo record found.";
-    }
-    else if(i==4)
-    {
-    system("cls");
-    fflush(stdin);
-    cout<<"\n\t\t->Please Enter Details :-\n";
-    cout<<"\n\n\t\tEnter Student's ID : ";
-    cin.getline(st,50);
-    cout<<"\n\t\tEnter Book's ID : ";
-    cin.getline(st1,20);
-    fstream intf("student.txt",ios::in|ios::out|ios::ate|ios::binary);
-    intf.seekg(0);
-    intf.read((char*)this,sizeof(*this));
-    while(!intf.eof())
-        {
-            for(i=0;sc[i]!='\0'&&st1[i]!='\0'&&st1[i]==sc[i];i++);
-            for(j=0;sc1[j]!='\0'&&st[j]!='\0'&&st[j]==sc1[j];j++);
-            if(sc[i]=='\0'&&sc1[j]=='\0'&&st[j]=='\0'&&st1[i]=='\0')
-                {
-                    d=q;
-                    m=B;
-                    y=p;
-                    cout<<"\n\t\tEnter New Date : ";
-                    cin>>q>>B>>p;
-                    fine(d,m,y,q,B,p); //fn1
-                    intf.seekp(intf.tellp()-sizeof(*this)); //fn3
-                    intf.write((char*)this,sizeof(*this)); //fn5
-                    cout<<"\n\n\t\tReissue successfully."; //fn3
-                    break;
-                }
-                   intf.read((char*)this,sizeof(*this));
-        }
-        intf.close();
-    }
-    else if(i==5)
-    {
-    system("cls");
-    b=branch(2);
-    system("cls");
-    fflush(stdin);
-    cout<<"\n\t\t->Please Enter Details :-\n";
-    cout<<"\n\t\tEnter Book's ID : ";
-    cin.getline(st1,20);
-    der(st1,b,2);
-    cout<<"\n\n\t\tEnter Student's ID : ";
-    cin.getline(st,20);
-    cout<<"\n\t\tEnter Present date : ";
-    cin>>d>>m>>y;
-    ofstream outf("temp.txt",ios::app|ios::binary);
-    ifstream intf("student.txt",ios::binary);
-    intf.read((char*)this,sizeof(*this));
-    while(!intf.eof())
-        {
-            for(i=0;sc[i]!='\0'&&st1[i]!='\0'&&st1[i]==sc[i];i++);
-            for(j=0;sc1[j]!='\0'&&st[j]!='\0'&&st[j]==sc1[j];j++);
-            if(sc[i]=='\0'&&sc1[j]=='\0'&&st[j]=='\0'&&st1[i]=='\0'&&cont==0)
-                {
-                    cont++;
-                    intf.read((char*)this,sizeof(*this));
-                    fine(q,B,p,d,m,y);
-                    cout<<"\n\t\tReturned successfully.";
-                }
-            else
-                {
-                    outf.write((char*)this,sizeof(*this));
-                    intf.read((char*)this,sizeof(*this));
-                }
-        }
-
-    intf.close();
-    outf.close();
-    getch();
-    remove("student.txt");
-    rename("temp.txt","student.txt");
-    }
-    else if(i==6)
-    {
-    system("cls");
-    librarian();
-    }
-    else
-        cout<<"\n\t\tWrong Input.\n";
-
-    cout<<"\n\n\t\tPress any key to continue.....";
-    getch();
-    system("cls");
-    librarian();
-}
-void Lib::fine(int d,int m,int y,int dd,int mm,int yy)
-{
-    long int n1,n2;
-    int years,l,i;
-    const int monthDays[12] = {31, 28, 31, 30, 31, 30,31, 31, 30, 31, 30, 31};
-    n1 = y*365 + d;
-    for (i=0; i<m - 1; i++)
-        n1 += monthDays[i]; //fn1353
-    years = y;
-    if (m <= 2)
-    years--;
-    l= years / 4 - years / 100 + years / 400;
-    n1 += l;
-    n2 = yy*365 + dd;
-    for (i=0; i<mm - 1; i++)
-        n2 += monthDays[i];
-    years = yy;
-    if (m <= 2)
-    years--;
-    l= years / 4 - years / 100 + years / 400;
-    n2 += l;
-    n1=n2-n1;
-    n2=n1-15;
-    if(n2>0)
-    cout<<"\n\t\tThe Total Fine is : "<<n2;
-    
-}
-void Lib::der(char st[],int b,int x)
-{
-    int i,cont=0;
-    fstream intf("Booksdata.txt",ios::in|ios::out|ios::ate|ios::binary);
-    intf.seekg(0);
-    intf.read((char*)this,sizeof(*this));
-    while(!intf.eof())
-    {
-        for(i=0;b==B&&sc[i]!='\0'&&st[i]!='\0'&&st[i]==sc[i];i++);
-        if(sc[i]=='\0'&&st[i]=='\0')
-        {
-            cont++;
-            if(x==1)
-            {
-                q--;
-            }
-            else
-            {
-                q++;
-            }
-            intf.seekp(intf.tellp()-sizeof(*this));
-            intf.write((char*)this,sizeof(*this));
-            break;
-        }
-        intf.read((char*)this,sizeof(*this));
-    }
-    if(cont==0)
-    {
-        cout<<"\n\t\tBook not found.\n";
-        cout<<"\n\n\t\tPress any key to continue.....";
-        getch();
-        system("cls");
-        issue();
-    }
-    intf.close();
-}
-void Lib::get()
-{
-   int i;
-        cout<<"\n\t*********** LIBRARY MANAGEMENT SYSTEM ***********\n"<<"\n\t\t\t    Learnprogramo <<LMS>> C++\n";
-        cout<<"\n\t\t>>Please Choose Any Option To login \n";
-        cout<<"\n\t\t1.Student\n\n\t\t2.Librarian\n\n\t\t3.Close Application\n";
-        cout<<"\n\t\tEnter your choice : ";
-        cin>>i;
-        if(i==1)
-        {
-            system("cls");
-            student();
-        }
-        else if(i==2)
-            pass();
-
-        else if(i==3)
-            exit(0);
-        else
-        {
-            cout<<"\n\t\tPlease enter correct option :(";
-            getch();
-            system("CLS");
-           get();
-        }
-}
-void Lib::student()
-{
-    int i;
-        cout<<"\n\t************ WELCOME STUDENT ************\n";
-        cout<<"\n\t\t>>Please Choose One Option:\n";
-        cout<<"\n\t\t1.View BookList\n\n\t\t2.Search for a Book\n\n\t\t3.Go to main menu\n\n\t\t4.Close Application\n";
-        cout<<"\n\t\tEnter your choice : ";
-        cin>>i;
-            if(i==1)
-                booklist(1);
-            else if(i==2)
-                see(1);
-            else if(i==3)
-            {
-                system("cls");
-                get();
-            }
-            else if(i==4)
-                exit(0);
-            else
-            {
-                cout<<"\n\t\tPlease enter correct option :(";
-                getch();
-                system("cls");
-                student();
-            }
-}
-void Lib::pass()
-{
-    int i=0;
-    char ch,st[21],ch1[21]={"learnprogramo"};
-    cout<<"\n\t\tEnter Password : ";
-    while(1)
-    {
-    ch=getch();
-    if(ch==13)
-    {
-        st[i]='\0';
-        break;
-    }
-    else if(ch==8&&i>0)
-    {
-        i--;
-        cout<<"\b \b";
-    }
-    else
-    {
-    cout<<"*";
-    st[i]=ch;
-    i++;
-    }
-    }
-    ifstream inf("password.txt");
-    inf>>ch1;
-    inf.close();
-    for(i=0;st[i]==ch1[i]&&st[i]!='\0'&&ch1[i]!='\0';i++);
-    if(st[i]=='\0'&&ch1[i]=='\0')
-    {
-        system("cls");
-        librarian();
-    }
-    else
-    {
-        cout<<"\n\n\t\tWrong Password.\n\n\t\ttry again.....\n";
-        getch();
-        system("cls");
-        get();
-    }
-}
-void Lib::librarian()
-{
-    int i;
-        cout<<"\n\t************ WELCOME LIBRARIAN ************\n";
-        cout<<"\n\t\t>>Please Choose One Option:\n";
-        cout<<"\n\t\t1.View BookList\n\n\t\t2.Search for a Book\n\n\t\t3.Modify/Add Book\n\n\t\t4.Issue Book\n\n\t\t5.Go to main menu\n\n\t\t6.Change Password\n\n\t\t7.Close Application\n";
-        cout<<"\n\t\tEnter your choice : ";
-        cin>>i;
-        switch(i)
-        {
-            case 1:booklist(2);
-                     break;
-            case 2:see(2);
-                     break;
-            case 3:modify();
-                     break;
-            case 4:issue();
-                     break;
-            case 5:system("cls");
-                     get();
-                     break;
-            case 6:password();
-                    break;
-            case 7:exit(0);
-            default:cout<<"\n\t\tPlease enter correct option :(";
-            getch();
-            system("cls");
-            librarian();
-        }
-}
-void Lib::password()
-{
-    int i=0,j=0;
-    char ch,st[21],ch1[21]={"learnprogramo"};
-    system("cls");
-    cout<<"\n\n\t\tEnter Old Password : ";
-    while(1)
-    {
-    ch=getch();
-    if(ch==13)
-    {
-        st[i]='\0';
-        break;
-    }
-    else if(ch==8&&i>0)
-    {
-        i--;
-        cout<<"\b \b";
-    }
-    else
-    {
-    cout<<"*";
-    st[i]=ch;
-    i++;
-    }
-    }
-    ifstream intf("password.txt");
-    intf>>ch1;
-    intf.close();
-    for(i=0;st[i]==ch1[i]&&st[i]!='\0'&&ch1[i]!='\0';i++);
-    if(st[i]=='\0'&&ch1[i]=='\0')
-    {
-        system("cls");
-        cout<<"\n\t**The Password Should be less than 20 characters & don't use spaces**\n\n";
-        cout<<"\n\t\tEnter New Password : ";
-        fflush(stdin);
-        i=0;
-        while(1)
-        {
-        j++;
-        ch=getch();
-        if(ch==13)
-        {
-            for(i=0;st[i]!=' '&&st[i]!='\0';i++);
-            if(j>20 || st[i]==' ')
-            {
-                cout<<"\n\n\t\tYou did't follow the instruction \n\n\t\tPress any key for try again.....";
-                getch();
-                system("cls");
-                password();
-                librarian();
-            }
-            st[i]='\0';
-            break;
-        }
-        else if(ch==8&&i>0)
-        {
-            i--;
-            cout<<"\b \b";
-        }
-        else
-        {
-        cout<<"*";
-        st[i]=ch;
-        i++;
-        }
-        }
-        ofstream outf("password.txt");
-        outf<<st;
-        outf.close();
-        cout<<"\n\n\t\tYour Password has been changed Successfully.";
-        cout<<"\n\t\tPress any key to continue......";
-        getch();
-        system("cls");
-        librarian();
-    }
-    else
-    {
-        cout<<"\n\n\t\tPassword is incorrect.....\n";
-        cout<<"\n\t\tEnter 1 for retry or 2 for menu";
-        cin>>i;
-        if(i==1)
-        {
-        system("cls");
-        password();
-        }
-        else
-        {
-            system("cls");
-            librarian();
-        }
-    }
-}
+int id;
+char stname[20];
+char name[20];
+char Author[20];
+int quantity;
+float Price;
+int count;
+int rackno;
+char *cat;
+struct meroDate issued;
+struct meroDate duedate;
+};
+struct books a;
 int main()
 {
-    Lib obj;
-    obj.get();
-    getch();
-    return 0;
+Password();
+getch();
+return 0;
+
 }
+void mainmenu()
+{
+//loaderanim();
+system("cls");
+//    textbackground(13);
+int i;
+gotoxy(20,3);
+printf("\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2 MAIN MENU \xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2");
+//    show_mouse();
+gotoxy(20,5);
+printf("\xDB\xDB\xDB\xDB\xB2 1. Add Books   ");
+gotoxy(20,7);
+printf("\xDB\xDB\xDB\xDB\xB2 2. Delete books");
+gotoxy(20,9);
+printf("\xDB\xDB\xDB\xDB\xB2 3. Search Books");
+gotoxy(20,11);
+printf("\xDB\xDB\xDB\xDB\xB2 4. Issue Books");
+gotoxy(20,13);
+printf("\xDB\xDB\xDB\xDB\xB2 5. View Book list");
+gotoxy(20,15);
+printf("\xDB\xDB\xDB\xDB\xB2 6. Edit Book's Record");
+gotoxy(20,17);
+printf("\xDB\xDB\xDB\xDB\xB2 7. Close Application");
+gotoxy(20,19);
+printf("\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2");
+gotoxy(20,20);
+t();
+gotoxy(20,21);
+printf("Enter your choice:");
+switch(getch())
+{
+case '1':
+addbooks();
+break;
+case '2':
+deletebooks();
+break;
+case '3':
+searchbooks();
+break;
+case '4':
+issuebooks();
+break;
+case '5':
+viewbooks();
+break;
+case '6':
+editbooks();
+break;
+case '7':
+{
+system("cls");
+gotoxy(16,3);
+printf("\tLibrary Management System");
+gotoxy(16,4);
+printf("\tMini Project in C");
+gotoxy(16,5);
+printf("\tis brought to you by");
+gotoxy(16,7);
+printf("\tCode with C Team");
+gotoxy(16,8);
+printf("******************************************");
+gotoxy(16,10);
+printf("*******************************************");
+gotoxy(16,11);
+printf("*******************************************");
+gotoxy(16,13);
+printf("********************************************");
+gotoxy(10,17);
+printf("Exiting in 3 second...........>");
+//flushall();
+Sleep(3000);
+exit(0);
+}
+default:
+{
+gotoxy(10,23);
+printf("\aWrong Entry!!Please re-entered correct option");
+if(getch())
+mainmenu();
+}
+
+}
+}
+void addbooks(void)    //funtion that add books
+{
+system("cls");
+int i;
+gotoxy(20,5);
+printf("\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2SELECT CATEGOIES\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2");
+gotoxy(20,7);
+printf("\xDB\xDB\xDB\xDB\xB2 1. Computer");
+gotoxy(20,9);
+printf("\xDB\xDB\xDB\xDB\xB2 2. Electronics");
+gotoxy(20,11);
+printf("\xDB\xDB\xDB\xDB\xB2 3. Electrical");
+gotoxy(20,13);
+printf("\xDB\xDB\xDB\xDB\xB2 4. Civil");
+gotoxy(20,15);
+printf("\xDB\xDB\xDB\xDB\xB2 5. Mechanical");
+gotoxy(20,17);
+printf("\xDB\xDB\xDB\xDB\xB2 6. Architecture");
+gotoxy(20,19);
+printf("\xDB\xDB\xDB\xDB\xB2 7. Back to main menu");
+gotoxy(20,21);
+printf("\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2");
+gotoxy(20,22);
+printf("Enter your choice:");
+scanf("%d",&s);
+if(s==7)
+
+mainmenu() ;
+system("cls");
+fp=fopen("Bibek.dat","ab+");
+if(getdata()==1)
+{
+a.cat=catagories[s-1];
+fseek(fp,0,SEEK_END);
+fwrite(&a,sizeof(a),1,fp);
+fclose(fp);
+gotoxy(21,14);
+printf("The record is sucessfully saved");
+gotoxy(21,15);
+printf("Save any more?(Y / N):");
+if(getch()=='n')
+mainmenu();
+else
+system("cls");
+addbooks();
+}
+}
+void deletebooks()    //function that delete items from file fp
+{
+system("cls");
+int d;
+char another='y';
+while(another=='y')  //infinite loop
+{
+system("cls");
+gotoxy(10,5);
+printf("Enter the Book ID to  delete:");
+scanf("%d",&d);
+fp=fopen("Bibek.dat","rb+");
+rewind(fp);
+while(fread(&a,sizeof(a),1,fp)==1)
+{
+if(a.id==d)
+{
+
+gotoxy(10,7);
+printf("The book record is available");
+gotoxy(10,8);
+printf("Book name is %s",a.name);
+gotoxy(10,9);
+printf("Rack No. is %d",a.rackno);
+findbook='t';
+}
+}
+if(findbook!='t')
+{
+gotoxy(10,10);
+printf("No record is found modify the search");
+if(getch())
+mainmenu();
+}
+if(findbook=='t' )
+{
+gotoxy(10,9);
+printf("Do you want to delete it?(Y/N):");
+if(getch()=='y')
+{
+ft=fopen("test.dat","wb+");  //temporary file for delete
+rewind(fp);
+while(fread(&a,sizeof(a),1,fp)==1)
+{
+if(a.id!=d)
+{
+fseek(ft,0,SEEK_CUR);
+fwrite(&a,sizeof(a),1,ft); //write all in tempory file except that
+}                              //we want to delete
+}
+fclose(ft);
+fclose(fp);
+remove("Bibek.dat");
+rename("test.dat","Bibek.dat"); //copy all item from temporary file to fp except that
+fp=fopen("Bibek.dat","rb+");    //we want to delete
+if(findbook=='t')
+{
+gotoxy(10,10);
+printf("The record is sucessfully deleted");
+gotoxy(10,11);
+printf("Delete another record?(Y/N)");
+}
+}
+else
+mainmenu();
+fflush(stdin);
+another=getch();
+}
+}
+gotoxy(10,15);
+mainmenu();
+}
+void searchbooks()
+{
+system("cls");
+int d;
+printf("*****************************Search Books*********************************");
+gotoxy(20,10);
+printf("\xDB\xDB\xDB\xB2 1. Search By ID");
+gotoxy(20,14);
+printf("\xDB\xDB\xDB\xB2 2. Search By Name");
+gotoxy( 15,20);
+printf("Enter Your Choice");
+fp=fopen("Bibek.dat","rb+"); //open file for reading propose
+rewind(fp);   //move pointer at the begining of file
+switch(getch())
+{
+case '1':
+{
+system("cls");
+gotoxy(25,4);
+printf("****Search Books By Id****");
+gotoxy(20,5);
+printf("Enter the book id:");
+scanf("%d",&d);
+gotoxy(20,7);
+printf("Searching........");
+while(fread(&a,sizeof(a),1,fp)==1)
+{
+if(a.id==d)
+{
+Sleep(2);
+gotoxy(20,7);
+printf("The Book is available");
+gotoxy(20,8);
+printf("\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2");
+gotoxy(20,9);
+printf("\xB2 ID:%d",a.id);gotoxy(47,9);printf("\xB2");
+gotoxy(20,10);
+printf("\xB2 Name:%s",a.name);gotoxy(47,10);printf("\xB2");
+gotoxy(20,11);
+printf("\xB2 Author:%s ",a.Author);gotoxy(47,11);printf("\xB2");
+gotoxy(20,12);
+printf("\xB2 Qantity:%d ",a.quantity);gotoxy(47,12);printf("\xB2"); gotoxy(47,11);printf("\xB2");
+gotoxy(20,13);
+printf("\xB2 Price:Rs.%.2f",a.Price);gotoxy(47,13);printf("\xB2");
+gotoxy(20,14);
+printf("\xB2 Rack No:%d ",a.rackno);gotoxy(47,14);printf("\xB2");
+gotoxy(20,15);
+printf("\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2");
+findbook='t';
+}
+
+}
+if(findbook!='t')  //checks whether conditiion enters inside loop or not
+{
+gotoxy(20,8);
+printf("\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2");
+gotoxy(20,9);printf("\xB2");  gotoxy(38,9);printf("\xB2");
+gotoxy(20,10);
+printf("\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2");
+gotoxy(22,9);printf("\aNo Record Found");
+}
+gotoxy(20,17);
+printf("Try another search?(Y/N)");
+if(getch()=='y')
+searchbooks();
+else
+mainmenu();
+break;
+}
+case '2':
+{
+char s[15];
+system("cls");
+gotoxy(25,4);
+printf("****Search Books By Name****");
+gotoxy(20,5);
+printf("Enter Book Name:");
+scanf("%s",s);
+int d=0;
+while(fread(&a,sizeof(a),1,fp)==1)
+{
+if(strcmp(a.name,(s))==0) //checks whether a.name is equal to s or not
+{
+gotoxy(20,7);
+printf("The Book is available");
+gotoxy(20,8);
+printf("\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2");
+gotoxy(20,9);
+printf("\xB2 ID:%d",a.id);gotoxy(47,9);printf("\xB2");
+gotoxy(20,10);
+printf("\xB2 Name:%s",a.name);gotoxy(47,10);printf("\xB2");
+gotoxy(20,11);
+printf("\xB2 Author:%s",a.Author);gotoxy(47,11);printf("\xB2");
+gotoxy(20,12);
+printf("\xB2 Qantity:%d",a.quantity);gotoxy(47,12);printf("\xB2");
+gotoxy(20,13);
+printf("\xB2 Price:Rs.%.2f",a.Price);gotoxy(47,13);printf("\xB2");
+gotoxy(20,14);
+printf("\xB2 Rack No:%d ",a.rackno);gotoxy(47,14);printf("\xB2");
+gotoxy(20,15);
+printf("\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2");
+d++;
+}
+
+}
+if(d==0)
+{
+gotoxy(20,8);
+printf("\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2");
+gotoxy(20,9);printf("\xB2");  gotoxy(38,9);printf("\xB2");
+gotoxy(20,10);
+printf("\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2");
+gotoxy(22,9);printf("\aNo Record Found");
+}
+gotoxy(20,17);
+printf("Try another search?(Y/N)");
+if(getch()=='y')
+searchbooks();
+else
+mainmenu();
+break;
+}
+default :
+getch();
+searchbooks();
+}
+fclose(fp);
+}
+void issuebooks(void)  //function that issue books from library
+{
+int t;
+
+system("cls");
+printf("********************************ISSUE SECTION**************************");
+gotoxy(10,5);
+printf("\xDB\xDB\xDB\xDb\xB2 1. Issue a Book");
+gotoxy(10,7);
+printf("\xDB\xDB\xDB\xDb\xB2 2. View Issued Book");
+gotoxy(10,9);
+printf("\xDB\xDB\xDB\xDb\xB2 3. Search Issued Book");
+gotoxy(10,11);
+printf("\xDB\xDB\xDB\xDb\xB2 4. Remove Issued Book");
+gotoxy(10,14);
+printf("Enter a Choice:");
+switch(getch())
+{
+case '1':  //issue book
+{
+system("cls");
+int c=0;
+char another='y';
+while(another=='y')
+{
+system("cls");
+gotoxy(15,4);
+printf("***Issue Book section***");
+gotoxy(10,6);
+printf("Enter the Book Id:");
+scanf("%d",&t);
+fp=fopen("Bibek.dat","rb");
+fs=fopen("Issue.dat","ab+");
+if(checkid(t)==0) //issues those which are present in library
+{
+gotoxy(10,8);
+printf("The book record is available");
+gotoxy(10,9);
+printf("There are %d unissued books in library ",a.quantity);
+gotoxy(10,10);
+printf("The name of book is %s",a.name);
+gotoxy(10,11);
+printf("Enter student name:");
+scanf("%s",a.stname);
+//struct dosdate_t d; //for current date
+//_dos_getdate(&d);
+//a.issued.dd=d.day;
+//a.issued.mm=d.month;
+//a.issued.yy=d.year;
+gotoxy(10,12);
+printf("Issued date=%d-%d-%d",a.issued.dd,a.issued.mm,a.issued.yy);
+gotoxy(10,13);
+printf("The BOOK of ID %d is issued",a.id);
+a.duedate.dd=a.issued.dd+RETURNTIME;   //for return date
+a.duedate.mm=a.issued.mm;
+a.duedate.yy=a.issued.yy;
+if(a.duedate.dd>30)
+{
+a.duedate.mm+=a.duedate.dd/30;
+a.duedate.dd-=30;
+
+}
+if(a.duedate.mm>12)
+{
+a.duedate.yy+=a.duedate.mm/12;
+a.duedate.mm-=12;
+
+}
+gotoxy(10,14);
+printf("To be return:%d-%d-%d",a.duedate.dd,a.duedate.mm,a.duedate.yy);
+fseek(fs,sizeof(a),SEEK_END);
+fwrite(&a,sizeof(a),1,fs);
+fclose(fs);
+c=1;
+}
+if(c==0)
+{
+gotoxy(10,11);
+printf("No record found");
+}
+gotoxy(10,15);
+printf("Issue any more(Y/N):");
+fflush(stdin);
+another=getche();
+fclose(fp);
+}
+
+break;
+}
+case '2':  //show issued book list
+{
+system("cls");
+int j=4;
+printf("*******************************Issued book list*******************************\n");
+gotoxy(2,2);
+printf("STUDENT NAME    CATEGORY    ID    BOOK NAME    ISSUED DATE    RETURN DATE");
+fs=fopen("Issue.dat","rb");
+while(fread(&a,sizeof(a),1,fs)==1)
+{
+
+gotoxy(2,j);
+printf("%s",a.stname);
+gotoxy(18,j);
+printf("%s",a.cat);
+gotoxy(30,j);
+printf("%d",a.id);
+gotoxy(36,j);
+printf("%s",a.name);
+gotoxy(51,j);
+printf("%d-%d-%d",a.issued.dd,a.issued.mm,a.issued.yy );
+gotoxy(65,j);
+printf("%d-%d-%d",a.duedate.dd,a.duedate.mm,a.duedate.yy);
+//struct dosdate_t d;
+//_dos_getdate(&d);
+gotoxy(50,25);
+//            printf("Current date=%d-%d-%d",d.day,d.month,d.year);
+j++;
+
+}
+fclose(fs);
+gotoxy(1,25);
+returnfunc();
+}
+break;
+case '3':   //search issued books by id
+{
+system("cls");
+gotoxy(10,6);
+printf("Enter Book ID:");
+int p,c=0;
+char another='y';
+while(another=='y')
+{
+
+scanf("%d",&p);
+fs=fopen("Issue.dat","rb");
+while(fread(&a,sizeof(a),1,fs)==1)
+{
+if(a.id==p)
+{
+issuerecord();
+gotoxy(10,12);
+printf("Press any key.......");
+getch();
+issuerecord();
+c=1;
+}
+
+}
+fflush(stdin);
+fclose(fs);
+if(c==0)
+{
+gotoxy(10,8);
+printf("No Record Found");
+}
+gotoxy(10,13);
+printf("Try Another Search?(Y/N)");
+another=getch();
+}
+}
+break;
+case '4':  //remove issued books from list
+{
+system("cls");
+int b;
+FILE *fg;  //declaration of temporary file for delete
+char another='y';
+while(another=='y')
+{
+gotoxy(10,5);
+printf("Enter book id to remove:");
+scanf("%d",&b);
+fs=fopen("Issue.dat","rb+");
+while(fread(&a,sizeof(a),1,fs)==1)
+{
+if(a.id==b)
+{
+issuerecord();
+findbook='t';
+}
+if(findbook=='t')
+{
+gotoxy(10,12);
+printf("Do You Want to Remove it?(Y/N)");
+if(getch()=='y')
+{
+fg=fopen("record.dat","wb+");
+rewind(fs);
+while(fread(&a,sizeof(a),1,fs)==1)
+{
+if(a.id!=b)
+{
+fseek(fs,0,SEEK_CUR);
+fwrite(&a,sizeof(a),1,fg);
+}
+}
+fclose(fs);
+fclose(fg);
+remove("Issue.dat");
+rename("record.dat","Issue.dat");
+gotoxy(10,14);
+printf("The issued book is removed from list");
+
+}
+
+}
+if(findbook!='t')
+{
+gotoxy(10,15);
+printf("No Record Found");
+}
+}
+gotoxy(10,16);
+printf("Delete any more?(Y/N)");
+another=getch();
+}
+}
+default:
+gotoxy(10,18);
+printf("\aWrong Entry!!");
+getch();
+issuebooks();
+break;
+}
+gotoxy(1,30);
+returnfunc();
+}
+void viewbooks(void)  //show the list of book persists in library
+{
+int i=0,j;
+system("cls");
+gotoxy(1,1);
+printf("*********************************Book List*****************************");
+gotoxy(2,2);
+printf(" CATEGORY     ID    BOOK NAME     AUTHOR       QTY     PRICE     RackNo ");
+j=4;
+fp=fopen("Bibek.dat","rb");
+while(fread(&a,sizeof(a),1,fp)==1)
+{
+gotoxy(3,j);
+printf("%s",a.cat);
+gotoxy(16,j);
+printf("%d",a.id);
+gotoxy(22,j);
+printf("%s",a.name);
+gotoxy(36,j);
+printf("%s",a.Author);
+gotoxy(50,j);
+printf("%d",a.quantity);
+gotoxy(57,j);
+printf("%.2f",a.Price);
+gotoxy(69,j);
+printf("%d",a.rackno);
+printf("\n\n");
+j++;
+i=i+a.quantity;
+}
+gotoxy(3,25);
+printf("Total Books =%d",i);
+fclose(fp);
+gotoxy(35,25);
+returnfunc();
+}
+void editbooks(void)  //edit information about book
+{
+system("cls");
+int c=0;
+int d,e;
+gotoxy(20,4);
+printf("****Edit Books Section****");
+char another='y';
+while(another=='y')
+{
+system("cls");
+gotoxy(15,6);
+printf("Enter Book Id to be edited:");
+scanf("%d",&d);
+fp=fopen("Bibek.dat","rb+");
+while(fread(&a,sizeof(a),1,fp)==1)
+{
+if(checkid(d)==0)
+{
+gotoxy(15,7);
+printf("The book is availble");
+gotoxy(15,8);
+printf("The Book ID:%d",a.id);
+gotoxy(15,9);
+printf("Enter new name:");scanf("%s",a.name);
+gotoxy(15,10);
+printf("Enter new Author:");scanf("%s",a.Author);
+gotoxy(15,11);
+printf("Enter new quantity:");scanf("%d",&a.quantity);
+gotoxy(15,12);
+printf("Enter new price:");scanf("%f",&a.Price);
+gotoxy(15,13);
+printf("Enter new rackno:");scanf("%d",&a.rackno);
+gotoxy(15,14);
+printf("The record is modified");
+fseek(fp,ftell(fp)-sizeof(a),0);
+fwrite(&a,sizeof(a),1,fp);
+fclose(fp);
+c=1;
+}
+if(c==0)
+{
+gotoxy(15,9);
+printf("No record found");
+}
+}
+gotoxy(15,16);
+printf("Modify another Record?(Y/N)");
+fflush(stdin);
+another=getch() ;
+}
+returnfunc();
+}
+void returnfunc(void)
+{
+{
+printf(" Press ENTER to return to main menu");
+}
+a:
+if(getch()==13) //allow only use of enter
+mainmenu();
+else
+goto a;
+}
+int getdata()
+{
+int t;
+gotoxy(20,3);printf("Enter the Information Below");
+gotoxy(20,4);printf("\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2");
+gotoxy(20,5);
+printf("\xB2");gotoxy(46,5);printf("\xB2");
+gotoxy(20,6);
+printf("\xB2");gotoxy(46,6);printf("\xB2");
+gotoxy(20,7);
+printf("\xB2");gotoxy(46,7);printf("\xB2");
+gotoxy(20,8);
+printf("\xB2");gotoxy(46,8);printf("\xB2");
+gotoxy(20,9);
+printf("\xB2");gotoxy(46,9);printf("\xB2");
+gotoxy(20,10);
+printf("\xB2");gotoxy(46,10);printf("\xB2");
+gotoxy(20,11);
+printf("\xB2");gotoxy(46,11);printf("\xB2");
+gotoxy(20,12);
+printf("\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2");
+gotoxy(21,5);
+printf("Category:");
+gotoxy(31,5);
+printf("%s",catagories[s-1]);
+gotoxy(21,6);
+printf("Book ID:\t");
+gotoxy(30,6);
+scanf("%d",&t);
+if(checkid(t) == 0)
+{
+gotoxy(21,13);
+printf("\aThe book id already exists\a");
+getch();
+mainmenu();
+return 0;
+}
+a.id=t;
+gotoxy(21,7);
+printf("Book Name:");gotoxy(33,7);
+scanf("%s",a.name);
+gotoxy(21,8);
+printf("Author:");gotoxy(30,8);
+scanf("%s",a.Author);
+gotoxy(21,9);
+printf("Quantity:");gotoxy(31,9);
+scanf("%d",&a.quantity);
+gotoxy(21,10);
+printf("Price:");gotoxy(28,10);
+scanf("%f",&a.Price);
+gotoxy(21,11);
+printf("Rack No:");gotoxy(30,11);
+scanf("%d",&a.rackno);
+return 1;
+}
+int checkid(int t)  //check whether the book is exist in library or not
+{
+rewind(fp);
+while(fread(&a,sizeof(a),1,fp)==1)
+if(a.id==t)
+return 0;  //returns 0 if book exits
+return 1; //return 1 if it not
+}
+int t(void) //for time
+{
+time_t t;
+time(&t);
+printf("Date and time:%s\n",ctime(&t));
+
+return 0 ;
+}
+/*void show_mouse(void) //show inactive mouse pointer in programme
+{
+union REGS in,out;
+       in.x.ax = 0x1;
+       int86(0x33,&in,&out);
+}*/
+void Password(void) //for password option
+{
+
+system("cls");
+char d[25]="Password Protected";
+char ch,pass[10];
+int i=0,j;
+//textbackground(WHITE);
+//textcolor(RED);
+gotoxy(10,4);
+for(j=0;j<20;j++)
+{
+Sleep(50);
+printf("*");
+}
+for(j=0;j<20;j++)
+{
+Sleep(50);
+printf("%c",d[j]);
+}
+for(j=0;j<20;j++)
+{
+Sleep(50);
+printf("*");
+}
+gotoxy(10,10);
+gotoxy(15,7);
+printf("Enter Password:");
+
+while(ch!=13)
+{
+ch=getch();
+
+if(ch!=13 && ch!=8){
+putch('*');
+pass[i] = ch;
+i++;
+}
+}
+pass[i] = '\0';
+if(strcmp(pass,password)==0)
+{
+
+gotoxy(15,9);
+//textcolor(BLINK);
+printf("Password match");
+gotoxy(17,10);
+printf("Press any key to countinue.....");
+getch();
+mainmenu();
+}
+else
+{
+gotoxy(15,16);
+printf("\aWarning!! Incorrect Password");
+getch();
+Password();
+}
+}
+void issuerecord()  //display issued book's information
+{
+system("cls");
+gotoxy(10,8);
+printf("The Book has taken by Mr. %s",a.stname);
+gotoxy(10,9);
+printf("Issued Date:%d-%d-%d",a.issued.dd,a.issued.mm,a.issued.yy);
+gotoxy(10,10);
+printf("Returning Date:%d-%d-%d",a.duedate.dd,a.duedate.mm,a.duedate.yy);
+}
+/*void loaderanim()
+{
+int loader;
+system("cls");
+gotoxy(20,10);
+printf("LOADING........");
+printf("\n\n");
+gotoxy(22,11);
+for(loader=1;loader<20;loader++)
+{
+Sleep(100);printf("%c",219);}
+}*/
+//End of program
